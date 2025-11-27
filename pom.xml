@@ -39,6 +39,7 @@
         <knife4j.version>4.3.0</knife4j.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
         <commons-pool2.version>2.12.0</commons-pool2.version>
+        <pagehelper.version>2.1.0</pagehelper.version>
 
         <skipTests>true</skipTests>
     </properties>
@@ -115,6 +116,13 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-pool2</artifactId>
                 <version>${commons-pool2.version}</version>
+            </dependency>
+
+            <!-- PageHelper 分页插件 -->
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper-spring-boot-starter</artifactId>
+                <version>${pagehelper.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

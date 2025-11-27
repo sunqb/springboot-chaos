@@ -1,20 +1,53 @@
 package com.chaos.service.service;
 
 import com.chaos.common.vo.AjaxResult;
+import com.github.pagehelper.PageInfo;
 import com.chaos.service.entity.bo.role.RoleBo;
+import com.chaos.service.entity.bo.role.RoleConditionBo;
 import com.chaos.service.entity.vo.role.RoleVo;
 
 import java.util.List;
 
 /**
  * 角色服务接口
+ *
+ * @author chaos
  */
 public interface IRoleService {
 
+    // ==================== 标准CRUD方法 ====================
+
     /**
-     * 查询角色列表
+     * 列表查询
      */
-    List<RoleVo> getRoleList(String roleName, Integer status);
+    List<RoleVo> list(RoleConditionBo condition);
+
+    /**
+     * 分页查询
+     */
+    PageInfo<RoleVo> page(RoleConditionBo condition);
+
+    /**
+     * 根据ID查询
+     */
+    RoleVo getById(Long id);
+
+    /**
+     * 新增
+     */
+    AjaxResult add(RoleBo bo);
+
+    /**
+     * 更新
+     */
+    AjaxResult update(RoleBo bo);
+
+    /**
+     * 删除（软删除）
+     */
+    AjaxResult delete(Long id);
+
+    // ==================== 业务自定义方法 ====================
 
     /**
      * 查询所有角色（下拉选项）
@@ -22,29 +55,9 @@ public interface IRoleService {
     List<RoleVo> getAllRoles();
 
     /**
-     * 根据ID查询角色
+     * 更新锁定状态
      */
-    RoleVo getRoleById(Long id);
-
-    /**
-     * 新增角色
-     */
-    AjaxResult addRole(RoleBo roleBo);
-
-    /**
-     * 更新角色
-     */
-    AjaxResult updateRole(RoleBo roleBo);
-
-    /**
-     * 删除角色
-     */
-    AjaxResult deleteRole(Long id);
-
-    /**
-     * 更新状态
-     */
-    AjaxResult updateStatus(Long id, Integer status);
+    AjaxResult updateLockStatus(Long id, Integer isLocked);
 
     /**
      * 分配菜单权限

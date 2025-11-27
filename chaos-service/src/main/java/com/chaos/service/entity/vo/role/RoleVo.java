@@ -10,6 +10,8 @@ import java.util.List;
 
 /**
  * 角色响应对象
+ *
+ * @author chaos
  */
 @Data
 @Schema(description = "角色响应对象")
@@ -18,7 +20,7 @@ public class RoleVo implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "主键ID")
+    @Schema(description = "角色id")
     private Long id;
 
     @Schema(description = "角色名称")
@@ -30,11 +32,11 @@ public class RoleVo implements Serializable {
     @Schema(description = "描述")
     private String description;
 
+    @Schema(description = "是否锁定：0-否，1-是")
+    private Integer isLocked;
+
     @Schema(description = "排序")
     private Integer sort;
-
-    @Schema(description = "状态：0-禁用，1-正常")
-    private Integer status;
 
     @Schema(description = "创建时间")
     private LocalDateTime createTime;

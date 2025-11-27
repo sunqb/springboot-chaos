@@ -2,12 +2,29 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.chaos.service.mapper.AdminRoleMapper">
 
-    <delete id="deleteByAdminId">
-        DELETE FROM sys_admin_role WHERE admin_id = #{adminId}
+    <resultMap id="BaseResultMap" type="com.chaos.service.entity.dto.admin.AdminRoleDto">
+        <id column="id" property="id"/>
+        <result column="admin_oid" property="adminOid"/>
+        <result column="role_id" property="roleId"/>
+        <result column="organization_id" property="organizationId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <delete id="deleteByAdminOid">
+        DELETE FROM p_admin_role WHERE admin_oid = #{adminOid}
     </delete>
 
     <delete id="deleteByRoleId">
-        DELETE FROM sys_admin_role WHERE role_id = #{roleId}
+        DELETE FROM p_admin_role WHERE role_id = #{roleId}
     </delete>
+
+    <insert id="batchInsert">
+        INSERT INTO p_admin_role (admin_oid, role_id, organization_id, create_time)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.adminOid}, #{item.roleId}, #{item.organizationId}, NOW())
+        </foreach>
+    </insert>
 
 </mapper>

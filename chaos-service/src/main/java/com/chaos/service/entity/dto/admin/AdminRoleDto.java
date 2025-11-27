@@ -1,6 +1,7 @@
 package com.chaos.service.entity.dto.admin;
 
 import com.baomidou.mybatisplus.annotation.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -11,37 +12,45 @@ import java.time.LocalDateTime;
 
 /**
  * 管理员角色关联表
+ *
+ * @author chaos
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("sys_admin_role")
+@TableName("p_admin_role")
+@Schema(description = "管理员角色关联实体")
 public class AdminRoleDto implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 主键ID
-     */
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(type = IdType.AUTO)
+    @Schema(description = "主键ID")
     private Long id;
 
-    /**
-     * 管理员ID
-     */
-    @TableField("admin_id")
-    private Long adminId;
+    @Schema(description = "管理员oid")
+    private String adminOid;
 
-    /**
-     * 角色ID
-     */
-    @TableField("role_id")
+    @Schema(description = "角色ID")
     private Long roleId;
 
-    /**
-     * 创建时间
-     */
-    @TableField(value = "create_time", fill = FieldFill.INSERT)
+    @Schema(description = "所属组织ID")
+    private Long organizationId;
+
+    @TableField(fill = FieldFill.INSERT)
+    @Schema(description = "创建人")
+    private String createBy;
+
+    @TableField(fill = FieldFill.INSERT)
+    @Schema(description = "创建时间")
     private LocalDateTime createTime;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @Schema(description = "更新人")
+    private String updateBy;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @Schema(description = "更新时间")
+    private LocalDateTime updateTime;
 }

@@ -10,6 +10,8 @@ import java.util.List;
 
 /**
  * 组织机构响应对象
+ *
+ * @author chaos
  */
 @Data
 @Schema(description = "组织机构响应对象")
@@ -18,22 +20,22 @@ public class OrganizationVo implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "主键ID")
+    @Schema(description = "主键")
     private Long id;
 
     @Schema(description = "父级ID")
     private Long parentId;
 
-    @Schema(description = "祖级列表")
-    private String ancestors;
+    @Schema(description = "上级组织机构ids")
+    private String superiorIds;
 
-    @Schema(description = "组织名称")
-    private String orgName;
+    @Schema(description = "组织机构名称")
+    private String name;
 
-    @Schema(description = "组织简称")
+    @Schema(description = "组织机构简称")
     private String shortName;
 
-    @Schema(description = "组织编码")
+    @Schema(description = "组织机构编码")
     private String orgCode;
 
     @Schema(description = "负责人")
@@ -45,11 +47,20 @@ public class OrganizationVo implements Serializable {
     @Schema(description = "邮箱")
     private String email;
 
+    @Schema(description = "状态：1-启用，2-禁用")
+    private Integer state;
+
+    @Schema(description = "是否统计：1-统计，2-不统计")
+    private Integer isStatistics;
+
     @Schema(description = "排序")
     private Integer sort;
 
-    @Schema(description = "状态：0-禁用，1-正常")
-    private Integer status;
+    @Schema(description = "生效开始时间")
+    private LocalDateTime authStartTime;
+
+    @Schema(description = "生效截止时间")
+    private LocalDateTime authEndTime;
 
     @Schema(description = "创建时间")
     private LocalDateTime createTime;

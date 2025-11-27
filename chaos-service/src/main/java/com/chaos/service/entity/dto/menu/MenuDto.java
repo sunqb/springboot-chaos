@@ -1,6 +1,7 @@
 package com.chaos.service.entity.dto.menu;
 
 import com.baomidou.mybatisplus.annotation.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -11,110 +12,67 @@ import java.time.LocalDateTime;
 
 /**
  * 菜单表
+ *
+ * @author chaos
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("sys_menu")
+@TableName("p_menu")
+@Schema(description = "菜单实体")
 public class MenuDto implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 主键ID
-     */
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(type = IdType.AUTO)
+    @Schema(description = "菜单id")
     private Long id;
 
-    /**
-     * 父菜单ID（一级菜单为0）
-     */
-    @TableField("parent_id")
+    @Schema(description = "菜单父id (一级菜单为0)")
     private Long parentId;
 
-    /**
-     * 菜单名称
-     */
-    @TableField("menu_name")
+    @Schema(description = "菜单名称")
     private String menuName;
 
-    /**
-     * 菜单类型：0-目录，1-菜单，2-按钮
-     */
-    @TableField("menu_type")
-    private Integer menuType;
-
-    /**
-     * 权限标识
-     */
-    @TableField("permission")
+    @Schema(description = "权限标识")
     private String permission;
 
-    /**
-     * 路由地址
-     */
-    @TableField("path")
-    private String path;
+    @Schema(description = "菜单状态：1-公开，2-不公开")
+    private Integer state;
 
-    /**
-     * 组件路径
-     */
-    @TableField("component")
+    @Schema(description = "菜单地址/路由")
+    private String url;
+
+    @Schema(description = "组件路径")
     private String component;
 
-    /**
-     * 图标
-     */
-    @TableField("icon")
-    private String icon;
+    @Schema(description = "类型：0-目录，1-菜单，2-按钮")
+    private Integer type;
 
-    /**
-     * 排序
-     */
-    @TableField("sort")
+    @Schema(description = "排序")
     private Integer sort;
 
-    /**
-     * 是否可见：0-隐藏，1-显示
-     */
-    @TableField("visible")
-    private Integer visible;
+    @Schema(description = "图标")
+    private String icon;
 
-    /**
-     * 状态：0-禁用，1-正常
-     */
-    @TableField("status")
-    private Integer status;
+    @Schema(description = "是否删除：0-正常，1-删除")
+    @TableLogic
+    private Integer isDelete;
 
-    /**
-     * 创建人
-     */
-    @TableField(value = "create_by", fill = FieldFill.INSERT)
+    @TableField(fill = FieldFill.INSERT)
+    @Schema(description = "创建人")
     private String createBy;
 
-    /**
-     * 创建时间
-     */
-    @TableField(value = "create_time", fill = FieldFill.INSERT)
+    @TableField(fill = FieldFill.INSERT)
+    @Schema(description = "创建时间")
     private LocalDateTime createTime;
 
-    /**
-     * 更新人
-     */
-    @TableField(value = "update_by", fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @Schema(description = "更新人")
     private String updateBy;
 
-    /**
-     * 更新时间
-     */
-    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @Schema(description = "更新时间")
     private LocalDateTime updateTime;
-
-    /**
-     * 删除标志：0-正常，1-删除
-     */
-    @TableField("del_flag")
-    @TableLogic
-    private Integer delFlag;
 }

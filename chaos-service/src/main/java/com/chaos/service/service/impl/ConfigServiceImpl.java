@@ -1,20 +1,25 @@
 package com.chaos.service.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.chaos.common.vo.AjaxResult;
+import com.chaos.service.entity.bo.config.ConfigBo;
+import com.chaos.service.entity.bo.config.ConfigConditionBo;
 import com.chaos.service.entity.dto.config.ConfigDto;
 import com.chaos.service.mapper.ConfigMapper;
 import com.chaos.service.service.IConfigService;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 /**
  * 系统配置服务实现
+ *
+ * @author chaos
  */
 @Slf4j
 @Service
@@ -23,14 +28,80 @@ public class ConfigServiceImpl implements IConfigService {
     @Resource
     private ConfigMapper configMapper;
 
+    // ==================== 标准CRUD方法 ====================
+
     @Override
-    public List<ConfigDto> getConfigList(String configName, String configKey) {
-        LambdaQueryWrapper<ConfigDto> wrapper = new LambdaQueryWrapper<>();
-        wrapper.like(StringUtils.isNotBlank(configName), ConfigDto::getConfigName, configName)
-                .like(StringUtils.isNotBlank(configKey), ConfigDto::getConfigKey, configKey)
-                .orderByDesc(ConfigDto::getCreateTime);
-        return configMapper.selectList(wrapper);
+    public List<ConfigDto> list(ConfigConditionBo condition) {
+        return configMapper.selectList(condition);
     }
+
+    @Override
+    public PageInfo<ConfigDto> page(ConfigConditionBo condition) {
+        PageHelper.startPage(condition.getPage(), condition.getLimit(), condition.getOrderBy());
+        List<ConfigDto> list = configMapper.selectList(condition);
+        return new PageInfo<>(list);
+    }
+
+    @Override
+    public ConfigDto getById(Long id) {
+        return configMapper.selectDetail(id);
+    }
+
+    @Override
+    public AjaxResult add(ConfigBo bo) {
+        // 检查配置键是否存在
+        ConfigDto existConfig = configMapper.selectByConfigKey(bo.getConfigKey());
+        if (existConfig != null) {
+            return AjaxResult.fail("配置键已存在");
+        }
+
+        ConfigDto configDto = new ConfigDto();
+        BeanUtil.copyProperties(bo, configDto);
+        configDto.setIsDelete(0);
+        configMapper.insert(configDto);
+        return AjaxResult.success("新增成功");
+    }
+
+    @Override
+    public AjaxResult update(ConfigBo bo) {
+        if (bo.getId() == null) {
+            return AjaxResult.fail("ID不能为空");
+        }
+
+        ConfigDto existConfig = configMapper.selectById(bo.getId());
+        if (existConfig == null) {
+            return AjaxResult.fail("配置不存在");
+        }
+
+        // 检查配置键是否被其他配置使用
+        ConfigDto keyExist = configMapper.selectByConfigKey(bo.getConfigKey());
+        if (keyExist != null && !keyExist.getId().equals(bo.getId())) {
+            return AjaxResult.fail("配置键已存在");
+        }
+
+        ConfigDto updateDto = new ConfigDto();
+        BeanUtil.copyProperties(bo, updateDto);
+        configMapper.updateById(updateDto);
+        return AjaxResult.success("更新成功");
+    }
+
+    @Override
+    public AjaxResult delete(Long id) {
+        ConfigDto configDto = configMapper.selectById(id);
+        if (configDto == null) {
+            return AjaxResult.fail("配置不存在");
+        }
+
+        // 软删除：更新is_delete字段
+        LambdaUpdateWrapper<ConfigDto> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(ConfigDto::getId, id)
+                .set(ConfigDto::getIsDelete, 1);
+        configMapper.update(null, updateWrapper);
+
+        return AjaxResult.success("删除成功");
+    }
+
+    // ==================== 业务自定义方法 ====================
 
     @Override
     public String getConfigValueByKey(String configKey) {
@@ -38,57 +109,4 @@ public class ConfigServiceImpl implements IConfigService {
         return configDto == null ? null : configDto.getConfigValue();
     }
 
-    @Override
-    public ConfigDto getConfigById(Long id) {
-        return configMapper.selectById(id);
-    }
-
-    @Override
-    public AjaxResult addConfig(ConfigDto configDto) {
-        // 检查配置键是否存在
-        ConfigDto existConfig = configMapper.selectByConfigKey(configDto.getConfigKey());
-        if (existConfig != null) {
-            return AjaxResult.fail("配置键已存在");
-        }
-
-        configMapper.insert(configDto);
-        return AjaxResult.success("新增成功");
-    }
-
-    @Override
-    public AjaxResult updateConfig(ConfigDto configDto) {
-        if (configDto.getId() == null) {
-            return AjaxResult.fail("ID不能为空");
-        }
-
-        ConfigDto existConfig = configMapper.selectById(configDto.getId());
-        if (existConfig == null) {
-            return AjaxResult.fail("配置不存在");
-        }
-
-        // 检查配置键是否被其他配置使用
-        ConfigDto keyExist = configMapper.selectByConfigKey(configDto.getConfigKey());
-        if (keyExist != null && !keyExist.getId().equals(configDto.getId())) {
-            return AjaxResult.fail("配置键已存在");
-        }
-
-        configMapper.updateById(configDto);
-        return AjaxResult.success("更新成功");
-    }
-
-    @Override
-    public AjaxResult deleteConfig(Long id) {
-        ConfigDto configDto = configMapper.selectById(id);
-        if (configDto == null) {
-            return AjaxResult.fail("配置不存在");
-        }
-
-        // 系统内置配置不允许删除
-        if (configDto.getConfigType() != null && configDto.getConfigType() == 0) {
-            return AjaxResult.fail("系统内置配置不允许删除");
-        }
-
-        configMapper.deleteById(id);
-        return AjaxResult.success("删除成功");
-    }
 }

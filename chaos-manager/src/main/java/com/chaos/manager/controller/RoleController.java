@@ -2,8 +2,10 @@ package com.chaos.manager.controller;
 
 import com.chaos.common.vo.AjaxResult;
 import com.chaos.service.entity.bo.role.RoleBo;
+import com.chaos.service.entity.bo.role.RoleConditionBo;
 import com.chaos.service.entity.vo.role.RoleVo;
 import com.chaos.service.service.IRoleService;
+import com.github.pagehelper.PageInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,6 +18,8 @@ import java.util.List;
 
 /**
  * 角色管理控制器
+ *
+ * @author chaos
  */
 @Slf4j
 @RestController
@@ -26,26 +30,26 @@ public class RoleController extends BaseController {
     @Resource
     private IRoleService roleService;
 
+    // ==================== 标准CRUD接口 ====================
+
     @GetMapping("/list")
     @Operation(summary = "查询角色列表")
-    public AjaxResult list(
-            @Parameter(description = "角色名称") @RequestParam(required = false) String roleName,
-            @Parameter(description = "状态") @RequestParam(required = false) Integer status) {
-        List<RoleVo> list = roleService.getRoleList(roleName, status);
+    public AjaxResult list(RoleConditionBo condition) {
+        List<RoleVo> list = roleService.list(condition);
         return AjaxResult.success(list);
     }
 
-    @GetMapping("/all")
-    @Operation(summary = "查询所有角色（下拉选项）")
-    public AjaxResult getAllRoles() {
-        List<RoleVo> list = roleService.getAllRoles();
-        return AjaxResult.success(list);
+    @GetMapping("/page")
+    @Operation(summary = "分页查询角色列表")
+    public AjaxResult page(RoleConditionBo condition) {
+        PageInfo<RoleVo> page = roleService.page(condition);
+        return AjaxResult.success(page);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "查询角色详情")
     public AjaxResult getById(@Parameter(description = "角色ID") @PathVariable Long id) {
-        RoleVo role = roleService.getRoleById(id);
+        RoleVo role = roleService.getById(id);
         if (role == null) {
             return AjaxResult.fail("角色不存在");
         }
@@ -54,32 +58,41 @@ public class RoleController extends BaseController {
 
     @PostMapping
     @Operation(summary = "新增角色")
-    public AjaxResult add(@Valid @RequestBody RoleBo roleBo) {
-        log.info("新增角色: {}", roleBo.getRoleName());
-        return roleService.addRole(roleBo);
+    public AjaxResult add(@Valid @RequestBody RoleBo bo) {
+        log.info("新增角色: {}", bo.getRoleName());
+        return roleService.add(bo);
     }
 
     @PutMapping
     @Operation(summary = "更新角色")
-    public AjaxResult update(@Valid @RequestBody RoleBo roleBo) {
-        log.info("更新角色: {}", roleBo.getId());
-        return roleService.updateRole(roleBo);
+    public AjaxResult update(@Valid @RequestBody RoleBo bo) {
+        log.info("更新角色: {}", bo.getId());
+        return roleService.update(bo);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "删除角色")
     public AjaxResult delete(@Parameter(description = "角色ID") @PathVariable Long id) {
         log.info("删除角色: {}", id);
-        return roleService.deleteRole(id);
+        return roleService.delete(id);
     }
 
-    @PutMapping("/updateStatus")
-    @Operation(summary = "更新状态")
-    public AjaxResult updateStatus(
+    // ==================== 业务自定义接口 ====================
+
+    @GetMapping("/all")
+    @Operation(summary = "查询所有角色（下拉选项）")
+    public AjaxResult getAllRoles() {
+        List<RoleVo> list = roleService.getAllRoles();
+        return AjaxResult.success(list);
+    }
+
+    @PutMapping("/updateLockStatus")
+    @Operation(summary = "更新锁定状态")
+    public AjaxResult updateLockStatus(
             @Parameter(description = "角色ID") @RequestParam Long id,
-            @Parameter(description = "状态") @RequestParam Integer status) {
-        log.info("更新状态: {} -> {}", id, status);
-        return roleService.updateStatus(id, status);
+            @Parameter(description = "锁定状态") @RequestParam Integer isLocked) {
+        log.info("更新锁定状态: {} -> {}", id, isLocked);
+        return roleService.updateLockStatus(id, isLocked);
     }
 
     @PostMapping("/assignMenus")

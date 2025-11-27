@@ -2,62 +2,101 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.chaos.service.mapper.UserMapper">
 
-    <!-- 基础结果映射 -->
     <resultMap id="BaseResultMap" type="com.chaos.service.entity.dto.user.UserDto">
         <id property="id" column="id"/>
-        <result property="username" column="username"/>
+        <result property="oid" column="oid"/>
+        <result property="account" column="account"/>
         <result property="password" column="password"/>
-        <result property="nickname" column="nickname"/>
-        <result property="email" column="email"/>
         <result property="phone" column="phone"/>
+        <result property="realName" column="real_name"/>
+        <result property="nickname" column="nickname"/>
         <result property="avatar" column="avatar"/>
-        <result property="status" column="status"/>
+        <result property="sex" column="sex"/>
+        <result property="birthday" column="birthday"/>
+        <result property="email" column="email"/>
+        <result property="lastLoginTime" column="last_login_time"/>
+        <result property="lastLoginIp" column="last_login_ip"/>
+        <result property="growth" column="growth"/>
+        <result property="score" column="score"/>
+        <result property="organizationId" column="organization_id"/>
+        <result property="isLocked" column="is_locked"/>
+        <result property="channel" column="channel"/>
+        <result property="remark" column="remark"/>
+        <result property="isDelete" column="is_delete"/>
+        <result property="createBy" column="create_by"/>
         <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
         <result property="updateTime" column="update_time"/>
-        <result property="isDeleted" column="is_deleted"/>
     </resultMap>
 
-    <!-- UserVo 结果映射 -->
     <resultMap id="UserVoResultMap" type="com.chaos.service.entity.vo.user.UserVo">
         <id property="id" column="id"/>
-        <result property="username" column="username"/>
-        <result property="nickname" column="nickname"/>
-        <result property="email" column="email"/>
+        <result property="oid" column="oid"/>
+        <result property="account" column="account"/>
         <result property="phone" column="phone"/>
+        <result property="realName" column="real_name"/>
+        <result property="nickname" column="nickname"/>
         <result property="avatar" column="avatar"/>
-        <result property="status" column="status"/>
+        <result property="sex" column="sex"/>
+        <result property="birthday" column="birthday"/>
+        <result property="email" column="email"/>
+        <result property="lastLoginTime" column="last_login_time"/>
+        <result property="lastLoginIp" column="last_login_ip"/>
+        <result property="growth" column="growth"/>
+        <result property="score" column="score"/>
+        <result property="organizationId" column="organization_id"/>
+        <result property="isLocked" column="is_locked"/>
+        <result property="channel" column="channel"/>
+        <result property="remark" column="remark"/>
         <result property="createTime" column="create_time"/>
-        <result property="updateTime" column="update_time"/>
     </resultMap>
 
-    <!-- 根据用户名查询 -->
-    <select id="selectByUsername" resultMap="BaseResultMap">
-        SELECT id, username, password, nickname, email, phone, avatar, status, create_time, update_time, is_deleted
-        FROM sys_user
-        WHERE username = #{username}
-          AND is_deleted = 0
-    </select>
+    <!-- ==================== 标准查询方法 ==================== -->
 
-    <!-- 查询用户列表 -->
-    <select id="selectUserList" resultMap="UserVoResultMap">
-        SELECT id, username, nickname, email, phone, avatar, status, create_time, update_time
-        FROM sys_user
-        WHERE is_deleted = 0
-        <if test="username != null and username != ''">
-            AND username LIKE CONCAT('%', #{username}, '%')
-        </if>
-        <if test="status != null">
-            AND status = #{status}
-        </if>
+    <select id="selectList" resultMap="UserVoResultMap">
+        SELECT id, oid, account, phone, real_name, nickname, avatar, sex, birthday, email,
+               last_login_time, last_login_ip, growth, score, organization_id, is_locked, channel, remark, create_time
+        FROM p_user
+        <where>
+            is_delete = 0
+            <if test="account != null and account != ''">
+                AND account LIKE CONCAT('%', #{account}, '%')
+            </if>
+            <if test="phone != null and phone != ''">
+                AND phone LIKE CONCAT('%', #{phone}, '%')
+            </if>
+            <if test="realName != null and realName != ''">
+                AND real_name LIKE CONCAT('%', #{realName}, '%')
+            </if>
+            <if test="isLocked != null">
+                AND is_locked = #{isLocked}
+            </if>
+            <if test="organizationId != null">
+                AND organization_id = #{organizationId}
+            </if>
+        </where>
         ORDER BY create_time DESC
     </select>
 
-    <!-- 查询用户详情 -->
-    <select id="selectUserById" resultMap="UserVoResultMap">
-        SELECT id, username, nickname, email, phone, avatar, status, create_time, update_time
-        FROM sys_user
-        WHERE id = #{id}
-          AND is_deleted = 0
+    <select id="selectDetail" resultMap="UserVoResultMap">
+        SELECT id, oid, account, phone, real_name, nickname, avatar, sex, birthday, email,
+               last_login_time, last_login_ip, growth, score, organization_id, is_locked, channel, remark, create_time
+        FROM p_user
+        WHERE id = #{id} AND is_delete = 0
+    </select>
+
+    <!-- ==================== 业务自定义方法 ==================== -->
+
+    <select id="selectByAccount" resultMap="BaseResultMap">
+        SELECT * FROM p_user WHERE account = #{account} AND is_delete = 0
+    </select>
+
+    <select id="selectByOid" resultMap="BaseResultMap">
+        SELECT * FROM p_user WHERE oid = #{oid} AND is_delete = 0
+    </select>
+
+    <select id="selectByPhone" resultMap="BaseResultMap">
+        SELECT * FROM p_user WHERE phone = #{phone} AND is_delete = 0
     </select>
 
 </mapper>

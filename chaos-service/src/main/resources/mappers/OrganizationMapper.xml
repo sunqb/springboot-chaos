@@ -5,32 +5,90 @@
     <resultMap id="BaseResultMap" type="com.chaos.service.entity.dto.org.OrganizationDto">
         <id column="id" property="id"/>
         <result column="parent_id" property="parentId"/>
-        <result column="ancestors" property="ancestors"/>
-        <result column="org_name" property="orgName"/>
+        <result column="superior_ids" property="superiorIds"/>
+        <result column="name" property="name"/>
         <result column="short_name" property="shortName"/>
         <result column="org_code" property="orgCode"/>
         <result column="leader" property="leader"/>
         <result column="phone" property="phone"/>
         <result column="email" property="email"/>
+        <result column="state" property="state"/>
+        <result column="is_statistics" property="isStatistics"/>
         <result column="sort" property="sort"/>
-        <result column="status" property="status"/>
+        <result column="auth_start_time" property="authStartTime"/>
+        <result column="auth_end_time" property="authEndTime"/>
+        <result column="is_delete" property="isDelete"/>
         <result column="create_by" property="createBy"/>
         <result column="create_time" property="createTime"/>
         <result column="update_by" property="updateBy"/>
         <result column="update_time" property="updateTime"/>
-        <result column="del_flag" property="delFlag"/>
     </resultMap>
 
+    <resultMap id="OrganizationVoResultMap" type="com.chaos.service.entity.vo.org.OrganizationVo">
+        <id column="id" property="id"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="superior_ids" property="superiorIds"/>
+        <result column="name" property="name"/>
+        <result column="short_name" property="shortName"/>
+        <result column="org_code" property="orgCode"/>
+        <result column="leader" property="leader"/>
+        <result column="phone" property="phone"/>
+        <result column="email" property="email"/>
+        <result column="state" property="state"/>
+        <result column="is_statistics" property="isStatistics"/>
+        <result column="sort" property="sort"/>
+        <result column="auth_start_time" property="authStartTime"/>
+        <result column="auth_end_time" property="authEndTime"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <!-- ==================== 标准查询方法 ==================== -->
+
+    <select id="selectList" resultMap="OrganizationVoResultMap">
+        SELECT id, parent_id, superior_ids, name, short_name, org_code, leader, phone, email,
+               state, is_statistics, sort, auth_start_time, auth_end_time, create_time
+        FROM p_organization
+        <where>
+            is_delete = 0
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="orgCode != null and orgCode != ''">
+                AND org_code LIKE CONCAT('%', #{orgCode}, '%')
+            </if>
+            <if test="state != null">
+                AND state = #{state}
+            </if>
+            <if test="parentId != null">
+                AND parent_id = #{parentId}
+            </if>
+        </where>
+        ORDER BY sort ASC, id ASC
+    </select>
+
+    <select id="selectDetail" resultMap="OrganizationVoResultMap">
+        SELECT id, parent_id, superior_ids, name, short_name, org_code, leader, phone, email,
+               state, is_statistics, sort, auth_start_time, auth_end_time, create_time
+        FROM p_organization
+        WHERE id = #{id} AND is_delete = 0
+    </select>
+
+    <!-- ==================== 业务自定义方法 ==================== -->
+
     <select id="selectAllOrdered" resultMap="BaseResultMap">
-        SELECT * FROM sys_organization WHERE del_flag = 0 ORDER BY sort, id
+        SELECT * FROM p_organization WHERE is_delete = 0 ORDER BY sort, id
     </select>
 
     <select id="selectByParentId" resultMap="BaseResultMap">
-        SELECT * FROM sys_organization WHERE parent_id = #{parentId} AND del_flag = 0 ORDER BY sort, id
+        SELECT * FROM p_organization WHERE parent_id = #{parentId} AND is_delete = 0 ORDER BY sort, id
     </select>
 
     <select id="selectByOrgCode" resultMap="BaseResultMap">
-        SELECT * FROM sys_organization WHERE org_code = #{orgCode} AND del_flag = 0
+        SELECT * FROM p_organization WHERE org_code = #{orgCode} AND is_delete = 0
+    </select>
+
+    <select id="selectEnabled" resultMap="BaseResultMap">
+        SELECT * FROM p_organization WHERE state = 1 AND is_delete = 0 ORDER BY sort, id
     </select>
 
 </mapper>

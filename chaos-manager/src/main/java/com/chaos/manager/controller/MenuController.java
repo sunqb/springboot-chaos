@@ -2,8 +2,10 @@ package com.chaos.manager.controller;
 
 import com.chaos.common.vo.AjaxResult;
 import com.chaos.service.entity.bo.menu.MenuBo;
+import com.chaos.service.entity.bo.menu.MenuConditionBo;
 import com.chaos.service.entity.vo.menu.MenuVo;
 import com.chaos.service.service.IMenuService;
+import com.github.pagehelper.PageInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,6 +18,8 @@ import java.util.List;
 
 /**
  * 菜单管理控制器
+ *
+ * @author chaos
  */
 @Slf4j
 @RestController
@@ -26,26 +30,26 @@ public class MenuController extends BaseController {
     @Resource
     private IMenuService menuService;
 
-    @GetMapping("/tree")
-    @Operation(summary = "查询菜单树")
-    public AjaxResult tree() {
-        List<MenuVo> tree = menuService.getMenuTree();
-        return AjaxResult.success(tree);
-    }
+    // ==================== 标准CRUD接口 ====================
 
     @GetMapping("/list")
     @Operation(summary = "查询菜单列表")
-    public AjaxResult list(
-            @Parameter(description = "菜单名称") @RequestParam(required = false) String menuName,
-            @Parameter(description = "状态") @RequestParam(required = false) Integer status) {
-        List<MenuVo> list = menuService.getMenuList(menuName, status);
+    public AjaxResult list(MenuConditionBo condition) {
+        List<MenuVo> list = menuService.list(condition);
         return AjaxResult.success(list);
+    }
+
+    @GetMapping("/page")
+    @Operation(summary = "分页查询菜单列表")
+    public AjaxResult page(MenuConditionBo condition) {
+        PageInfo<MenuVo> page = menuService.page(condition);
+        return AjaxResult.success(page);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "查询菜单详情")
     public AjaxResult getById(@Parameter(description = "菜单ID") @PathVariable Long id) {
-        MenuVo menu = menuService.getMenuById(id);
+        MenuVo menu = menuService.getById(id);
         if (menu == null) {
             return AjaxResult.fail("菜单不存在");
         }
@@ -54,22 +58,31 @@ public class MenuController extends BaseController {
 
     @PostMapping
     @Operation(summary = "新增菜单")
-    public AjaxResult add(@Valid @RequestBody MenuBo menuBo) {
-        log.info("新增菜单: {}", menuBo.getMenuName());
-        return menuService.addMenu(menuBo);
+    public AjaxResult add(@Valid @RequestBody MenuBo bo) {
+        log.info("新增菜单: {}", bo.getMenuName());
+        return menuService.add(bo);
     }
 
     @PutMapping
     @Operation(summary = "更新菜单")
-    public AjaxResult update(@Valid @RequestBody MenuBo menuBo) {
-        log.info("更新菜单: {}", menuBo.getId());
-        return menuService.updateMenu(menuBo);
+    public AjaxResult update(@Valid @RequestBody MenuBo bo) {
+        log.info("更新菜单: {}", bo.getId());
+        return menuService.update(bo);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "删除菜单")
     public AjaxResult delete(@Parameter(description = "菜单ID") @PathVariable Long id) {
         log.info("删除菜单: {}", id);
-        return menuService.deleteMenu(id);
+        return menuService.delete(id);
+    }
+
+    // ==================== 业务自定义接口 ====================
+
+    @GetMapping("/tree")
+    @Operation(summary = "查询菜单树")
+    public AjaxResult tree() {
+        List<MenuVo> tree = menuService.getMenuTree();
+        return AjaxResult.success(tree);
     }
 }

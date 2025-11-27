@@ -1,132 +1,103 @@
 package com.chaos.service.entity.dto.admin;
 
 import com.baomidou.mybatisplus.annotation.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
  * 管理员表
+ *
+ * @author chaos
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("sys_admin")
+@TableName("p_admin")
+@Schema(description = "管理员实体")
 public class AdminDto implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 主键ID
-     */
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(type = IdType.AUTO)
+    @Schema(description = "主键")
     private Long id;
 
-    /**
-     * 账户名
-     */
-    @TableField("username")
-    private String username;
+    @Schema(description = "oid")
+    private String oid;
 
-    /**
-     * 密码
-     */
-    @TableField("password")
+    @Schema(description = "账户名")
+    private String accountName;
+
+    @Schema(description = "密码")
     private String password;
 
-    /**
-     * 真实姓名
-     */
-    @TableField("real_name")
-    private String realName;
-
-    /**
-     * 手机号
-     */
-    @TableField("phone")
+    @Schema(description = "手机号")
     private String phone;
 
-    /**
-     * 邮箱
-     */
-    @TableField("email")
+    @Schema(description = "管理员姓名")
+    private String adminName;
+
+    @Schema(description = "微信unionid")
+    private String weixinUnionid;
+
+    @Schema(description = "联系电话")
+    private String contactNumber;
+
+    @Schema(description = "邮箱")
     private String email;
 
-    /**
-     * 头像
-     */
-    @TableField("avatar")
-    private String avatar;
-
-    /**
-     * 性别：0-未知，1-男，2-女
-     */
-    @TableField("sex")
+    @Schema(description = "性别：1-男，2-女")
     private Integer sex;
 
-    /**
-     * 所属组织ID
-     */
-    @TableField("org_id")
-    private Long orgId;
+    @Schema(description = "生日")
+    private LocalDate birthday;
 
-    /**
-     * 最后登录时间
-     */
-    @TableField("last_login_time")
+    @Schema(description = "最后登录时间")
     private LocalDateTime lastLoginTime;
 
-    /**
-     * 最后登录IP
-     */
-    @TableField("last_login_ip")
-    private String lastLoginIp;
+    @Schema(description = "头像")
+    private String picture;
 
-    /**
-     * 状态：0-禁用，1-正常
-     */
-    @TableField("status")
-    private Integer status;
+    @Schema(description = "是否锁定：0-否，1-是")
+    private Integer isLocked;
 
-    /**
-     * 备注
-     */
-    @TableField("remark")
+    @Schema(description = "介绍")
+    private String introduction;
+
+    @Schema(description = "备注")
     private String remark;
 
-    /**
-     * 创建人
-     */
-    @TableField(value = "create_by", fill = FieldFill.INSERT)
+    @Schema(description = "所属组织ID")
+    private Long organizationId;
+
+    @Schema(description = "是否激活：0-否，1-是")
+    private Integer isActivation;
+
+    @Schema(description = "是否删除：0-正常，1-删除")
+    @TableLogic
+    private Integer isDelete;
+
+    @TableField(fill = FieldFill.INSERT)
+    @Schema(description = "创建人")
     private String createBy;
 
-    /**
-     * 创建时间
-     */
-    @TableField(value = "create_time", fill = FieldFill.INSERT)
+    @TableField(fill = FieldFill.INSERT)
+    @Schema(description = "创建时间")
     private LocalDateTime createTime;
 
-    /**
-     * 更新人
-     */
-    @TableField(value = "update_by", fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @Schema(description = "更新人")
     private String updateBy;
 
-    /**
-     * 更新时间
-     */
-    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @Schema(description = "更新时间")
     private LocalDateTime updateTime;
-
-    /**
-     * 删除标志：0-正常，1-删除
-     */
-    @TableField("del_flag")
-    @TableLogic
-    private Integer delFlag;
 }

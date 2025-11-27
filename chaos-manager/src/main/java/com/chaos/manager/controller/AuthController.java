@@ -24,6 +24,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 管理员认证控制器
+ *
+ * @author chaos
  */
 @Slf4j
 @RestController
@@ -40,7 +42,7 @@ public class AuthController extends BaseController {
     @PostMapping("/login")
     @Operation(summary = "管理员登录")
     public AjaxResult login(@Valid @RequestBody AdminLoginBo loginBo) {
-        log.info("管理员登录: {}", loginBo.getUsername());
+        log.info("管理员登录: {}", loginBo.getAccountName());
 
         // 验证码校验（如果启用）
         if (loginBo.getCaptchaKey() != null && !loginBo.getCaptchaKey().isEmpty()) {
@@ -59,11 +61,11 @@ public class AuthController extends BaseController {
         // 执行登录
         AdminVo adminVo = adminService.login(loginBo);
 
-        // Sa-Token 登录
-        StpUtil.login(adminVo.getId());
+        // Sa-Token 登录（使用oid作为登录ID）
+        StpUtil.login(adminVo.getOid());
 
         // 获取权限列表
-        List<String> permissions = adminService.getPermissionsByAdminId(adminVo.getId());
+        List<String> permissions = adminService.getPermissionsByAdminOid(adminVo.getOid());
         adminVo.setPermissions(permissions);
 
         // 构建返回数据
@@ -72,7 +74,7 @@ public class AuthController extends BaseController {
         result.put("tokenName", StpUtil.getTokenName());
         result.put("admin", adminVo);
 
-        log.info("管理员登录成功: {} - {}", loginBo.getUsername(), getClientIp());
+        log.info("管理员登录成功: {} - {}", loginBo.getAccountName(), getClientIp());
         return AjaxResult.success(result, "登录成功");
     }
 
@@ -89,8 +91,8 @@ public class AuthController extends BaseController {
     @GetMapping("/info")
     @Operation(summary = "获取当前管理员信息")
     public AjaxResult getAdminInfo() {
-        Long adminId = getCurrentAdminId();
-        return adminService.getAdminInfo(adminId);
+        String adminOid = StpUtil.getLoginIdAsString();
+        return adminService.getAdminInfo(adminOid);
     }
 
     @GetMapping("/token")

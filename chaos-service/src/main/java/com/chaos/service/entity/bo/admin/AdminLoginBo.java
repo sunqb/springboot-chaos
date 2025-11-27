@@ -9,6 +9,8 @@ import java.io.Serializable;
 
 /**
  * 管理员登录请求参数
+ *
+ * @author chaos
  */
 @Data
 @Schema(description = "管理员登录请求参数")
@@ -17,9 +19,9 @@ public class AdminLoginBo implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @NotBlank(message = "用户名不能为空")
-    @Schema(description = "用户名")
-    private String username;
+    @NotBlank(message = "账户名不能为空")
+    @Schema(description = "账户名")
+    private String accountName;
 
     @NotBlank(message = "密码不能为空")
     @Schema(description = "密码")

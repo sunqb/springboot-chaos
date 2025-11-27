@@ -23,6 +23,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 认证控制器
+ *
+ * @author chaos
  */
 @Slf4j
 @RestController
@@ -39,7 +41,7 @@ public class AuthController extends BaseController {
     @PostMapping("/login")
     @Operation(summary = "用户登录")
     public AjaxResult login(@Valid @RequestBody LoginBo loginBo) {
-        log.info("用户登录: {}", loginBo.getUsername());
+        log.info("用户登录: {}", loginBo.getAccount());
 
         // 验证码校验（如果启用）
         if (loginBo.getCaptchaKey() != null && !loginBo.getCaptchaKey().isEmpty()) {
@@ -58,8 +60,8 @@ public class AuthController extends BaseController {
         // 执行登录
         UserVo userVo = userService.login(loginBo);
 
-        // Sa-Token 登录
-        StpUtil.login(userVo.getId());
+        // Sa-Token 登录（使用oid作为登录ID）
+        StpUtil.login(userVo.getOid());
 
         // 构建返回数据
         Map<String, Object> result = new HashMap<>();
@@ -67,7 +69,7 @@ public class AuthController extends BaseController {
         result.put("tokenName", StpUtil.getTokenName());
         result.put("user", userVo);
 
-        log.info("用户登录成功: {} - {}", loginBo.getUsername(), getClientIp());
+        log.info("用户登录成功: {} - {}", loginBo.getAccount(), getClientIp());
         return AjaxResult.success(result, "登录成功");
     }
 

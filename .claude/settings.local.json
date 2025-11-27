@@ -10,7 +10,15 @@
       "Bash(git init:*)",
       "Bash(git remote add:*)",
       "Bash(git add:*)",
-      "Bash(git commit -m \"$(cat <<''EOF''\nfeat: 初始化 SpringBoot-Chaos 脚手架项目\n\n项目结构：\n- chaos-common: 公共模块（常量、工具类、异常处理）\n- chaos-service: 业务模块（实体、Mapper、Service）\n- chaos-web: Web模块（控制器、配置、过滤器）\n\n技术栈：\n- Spring Boot 3.2.x + JDK 17\n- Sa-Token 1.37.0 认证框架\n- MyBatis-Plus 3.5.5\n- Druid 1.2.20 数据库连接池\n- Redis 缓存\n- Knife4j 4.3.0 API文档\n\n功能特性：\n- 用户管理模块（登录/注册/CRUD）\n- 统一响应封装（AjaxResult）\n- 全局异常处理\n- XSS过滤器\n- 图形验证码\n- 日志配置（Logback）\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
+      "Bash(git commit -m \"$(cat <<''EOF''\nfeat: 初始化 SpringBoot-Chaos 脚手架项目\n\n项目结构：\n- chaos-common: 公共模块（常量、工具类、异常处理）\n- chaos-service: 业务模块（实体、Mapper、Service）\n- chaos-web: Web模块（控制器、配置、过滤器）\n\n技术栈：\n- Spring Boot 3.2.x + JDK 17\n- Sa-Token 1.37.0 认证框架\n- MyBatis-Plus 3.5.5\n- Druid 1.2.20 数据库连接池\n- Redis 缓存\n- Knife4j 4.3.0 API文档\n\n功能特性：\n- 用户管理模块（登录/注册/CRUD）\n- 统一响应封装（AjaxResult）\n- 全局异常处理\n- XSS过滤器\n- 图形验证码\n- 日志配置（Logback）\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(git commit:*)",
+      "Bash(export JAVA_HOME=/Volumes/samsungssd/soft/jdk-21.0.8.jdk/Contents/Home)",
+      "Bash(java -version:*)",
+      "Bash(mvn clean install:*)",
+      "Bash(export PATH=$JAVA_HOME/bin:$PATH)",
+      "Bash(mvn clean compile:*)"
     ],
     "deny": [],
     "ask": []

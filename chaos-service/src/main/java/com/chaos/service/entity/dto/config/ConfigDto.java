@@ -1,6 +1,7 @@
 package com.chaos.service.entity.dto.config;
 
 import com.baomidou.mybatisplus.annotation.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -10,74 +11,50 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 系统配置表
+ * 配置表
+ *
+ * @author chaos
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("sys_config")
+@TableName("p_config")
+@Schema(description = "配置实体")
 public class ConfigDto implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 主键ID
-     */
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(type = IdType.AUTO)
+    @Schema(description = "参数配置id")
     private Long id;
 
-    /**
-     * 配置名称
-     */
-    @TableField("config_name")
-    private String configName;
-
-    /**
-     * 配置键
-     */
-    @TableField("config_key")
+    @Schema(description = "参数配置key")
     private String configKey;
 
-    /**
-     * 配置值
-     */
-    @TableField("config_value")
+    @Schema(description = "参数配置value")
     private String configValue;
 
-    /**
-     * 配置类型：0-系统内置，1-自定义
-     */
-    @TableField("config_type")
-    private Integer configType;
+    @Schema(description = "参数配置说明")
+    private String configDescription;
 
-    /**
-     * 备注
-     */
-    @TableField("remark")
-    private String remark;
+    @Schema(description = "是否删除：0-正常，1-删除")
+    @TableLogic
+    private Integer isDelete;
 
-    /**
-     * 创建人
-     */
-    @TableField(value = "create_by", fill = FieldFill.INSERT)
+    @TableField(fill = FieldFill.INSERT)
+    @Schema(description = "创建人")
     private String createBy;
 
-    /**
-     * 创建时间
-     */
-    @TableField(value = "create_time", fill = FieldFill.INSERT)
+    @TableField(fill = FieldFill.INSERT)
+    @Schema(description = "创建时间")
     private LocalDateTime createTime;
 
-    /**
-     * 更新人
-     */
-    @TableField(value = "update_by", fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @Schema(description = "更新人")
     private String updateBy;
 
-    /**
-     * 更新时间
-     */
-    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @Schema(description = "更新时间")
     private LocalDateTime updateTime;
 }

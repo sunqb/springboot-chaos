@@ -7,29 +7,71 @@
         <result column="role_name" property="roleName"/>
         <result column="role_code" property="roleCode"/>
         <result column="description" property="description"/>
+        <result column="is_locked" property="isLocked"/>
         <result column="sort" property="sort"/>
-        <result column="status" property="status"/>
+        <result column="is_delete" property="isDelete"/>
         <result column="create_by" property="createBy"/>
         <result column="create_time" property="createTime"/>
         <result column="update_by" property="updateBy"/>
         <result column="update_time" property="updateTime"/>
-        <result column="del_flag" property="delFlag"/>
     </resultMap>
 
+    <resultMap id="RoleVoResultMap" type="com.chaos.service.entity.vo.role.RoleVo">
+        <id column="id" property="id"/>
+        <result column="role_name" property="roleName"/>
+        <result column="role_code" property="roleCode"/>
+        <result column="description" property="description"/>
+        <result column="is_locked" property="isLocked"/>
+        <result column="sort" property="sort"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <!-- ==================== 标准查询方法 ==================== -->
+
+    <select id="selectList" resultMap="RoleVoResultMap">
+        SELECT id, role_name, role_code, description, is_locked, sort, create_time
+        FROM p_role
+        <where>
+            is_delete = 0
+            <if test="roleName != null and roleName != ''">
+                AND role_name LIKE CONCAT('%', #{roleName}, '%')
+            </if>
+            <if test="roleCode != null and roleCode != ''">
+                AND role_code LIKE CONCAT('%', #{roleCode}, '%')
+            </if>
+            <if test="isLocked != null">
+                AND is_locked = #{isLocked}
+            </if>
+        </where>
+        ORDER BY sort ASC, create_time DESC
+    </select>
+
+    <select id="selectDetail" resultMap="RoleVoResultMap">
+        SELECT id, role_name, role_code, description, is_locked, sort, create_time
+        FROM p_role
+        WHERE id = #{id} AND is_delete = 0
+    </select>
+
+    <!-- ==================== 业务自定义方法 ==================== -->
+
     <select id="selectByRoleCode" resultMap="BaseResultMap">
-        SELECT * FROM sys_role WHERE role_code = #{roleCode} AND del_flag = 0
+        SELECT * FROM p_role WHERE role_code = #{roleCode} AND is_delete = 0
     </select>
 
     <select id="selectMenuIdsByRoleId" resultType="java.lang.Long">
-        SELECT menu_id FROM sys_role_menu WHERE role_id = #{roleId}
+        SELECT menu_id FROM p_role_menu WHERE role_id = #{roleId}
     </select>
 
-    <select id="selectRolesByAdminId" resultMap="BaseResultMap">
+    <select id="selectRolesByAdminOid" resultMap="BaseResultMap">
         SELECT r.*
-        FROM sys_role r
-        INNER JOIN sys_admin_role ar ON r.id = ar.role_id
-        WHERE ar.admin_id = #{adminId} AND r.del_flag = 0
+        FROM p_role r
+        INNER JOIN p_admin_role ar ON r.id = ar.role_id
+        WHERE ar.admin_oid = #{adminOid} AND r.is_delete = 0
         ORDER BY r.sort
+    </select>
+
+    <select id="selectAllEnabled" resultMap="BaseResultMap">
+        SELECT * FROM p_role WHERE is_locked = 0 AND is_delete = 0 ORDER BY sort
     </select>
 
 </mapper>

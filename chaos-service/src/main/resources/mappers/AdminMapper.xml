@@ -4,43 +4,115 @@
 
     <resultMap id="BaseResultMap" type="com.chaos.service.entity.dto.admin.AdminDto">
         <id column="id" property="id"/>
-        <result column="username" property="username"/>
+        <result column="oid" property="oid"/>
+        <result column="account_name" property="accountName"/>
         <result column="password" property="password"/>
-        <result column="real_name" property="realName"/>
         <result column="phone" property="phone"/>
+        <result column="admin_name" property="adminName"/>
+        <result column="weixin_unionid" property="weixinUnionid"/>
+        <result column="contact_number" property="contactNumber"/>
         <result column="email" property="email"/>
-        <result column="avatar" property="avatar"/>
         <result column="sex" property="sex"/>
-        <result column="org_id" property="orgId"/>
+        <result column="birthday" property="birthday"/>
         <result column="last_login_time" property="lastLoginTime"/>
-        <result column="last_login_ip" property="lastLoginIp"/>
-        <result column="status" property="status"/>
+        <result column="picture" property="picture"/>
+        <result column="is_locked" property="isLocked"/>
+        <result column="introduction" property="introduction"/>
         <result column="remark" property="remark"/>
+        <result column="organization_id" property="organizationId"/>
+        <result column="is_activation" property="isActivation"/>
+        <result column="is_delete" property="isDelete"/>
         <result column="create_by" property="createBy"/>
         <result column="create_time" property="createTime"/>
         <result column="update_by" property="updateBy"/>
         <result column="update_time" property="updateTime"/>
-        <result column="del_flag" property="delFlag"/>
     </resultMap>
 
-    <select id="selectByUsername" resultMap="BaseResultMap">
-        SELECT * FROM sys_admin WHERE username = #{username} AND del_flag = 0
+    <resultMap id="AdminVoResultMap" type="com.chaos.service.entity.vo.admin.AdminVo">
+        <id column="id" property="id"/>
+        <result column="oid" property="oid"/>
+        <result column="account_name" property="accountName"/>
+        <result column="phone" property="phone"/>
+        <result column="admin_name" property="adminName"/>
+        <result column="contact_number" property="contactNumber"/>
+        <result column="email" property="email"/>
+        <result column="sex" property="sex"/>
+        <result column="birthday" property="birthday"/>
+        <result column="picture" property="picture"/>
+        <result column="introduction" property="introduction"/>
+        <result column="remark" property="remark"/>
+        <result column="organization_id" property="organizationId"/>
+        <result column="organization_name" property="organizationName"/>
+        <result column="is_locked" property="isLocked"/>
+        <result column="is_activation" property="isActivation"/>
+        <result column="last_login_time" property="lastLoginTime"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <!-- ==================== 标准查询方法 ==================== -->
+
+    <select id="selectList" resultMap="AdminVoResultMap">
+        SELECT a.id, a.oid, a.account_name, a.phone, a.admin_name, a.contact_number,
+               a.email, a.sex, a.birthday, a.picture, a.introduction, a.remark,
+               a.organization_id, o.org_name as organization_name,
+               a.is_locked, a.is_activation, a.last_login_time, a.create_time
+        FROM p_admin a
+        LEFT JOIN p_organization o ON a.organization_id = o.id
+        <where>
+            a.is_delete = 0
+            <if test="accountName != null and accountName != ''">
+                AND a.account_name LIKE CONCAT('%', #{accountName}, '%')
+            </if>
+            <if test="adminName != null and adminName != ''">
+                AND a.admin_name LIKE CONCAT('%', #{adminName}, '%')
+            </if>
+            <if test="phone != null and phone != ''">
+                AND a.phone LIKE CONCAT('%', #{phone}, '%')
+            </if>
+            <if test="isLocked != null">
+                AND a.is_locked = #{isLocked}
+            </if>
+            <if test="organizationId != null">
+                AND a.organization_id = #{organizationId}
+            </if>
+        </where>
+        ORDER BY a.create_time DESC
     </select>
 
-    <select id="selectRoleIdsByAdminId" resultType="java.lang.Long">
-        SELECT role_id FROM sys_admin_role WHERE admin_id = #{adminId}
+    <select id="selectDetail" resultMap="AdminVoResultMap">
+        SELECT a.id, a.oid, a.account_name, a.phone, a.admin_name, a.contact_number,
+               a.email, a.sex, a.birthday, a.picture, a.introduction, a.remark,
+               a.organization_id, o.org_name as organization_name,
+               a.is_locked, a.is_activation, a.last_login_time, a.create_time
+        FROM p_admin a
+        LEFT JOIN p_organization o ON a.organization_id = o.id
+        WHERE a.id = #{id} AND a.is_delete = 0
     </select>
 
-    <select id="selectPermissionsByAdminId" resultType="java.lang.String">
+    <!-- ==================== 业务自定义方法 ==================== -->
+
+    <select id="selectByAccountName" resultMap="BaseResultMap">
+        SELECT * FROM p_admin WHERE account_name = #{accountName} AND is_delete = 0
+    </select>
+
+    <select id="selectByOid" resultMap="BaseResultMap">
+        SELECT * FROM p_admin WHERE oid = #{oid} AND is_delete = 0
+    </select>
+
+    <select id="selectRoleIdsByAdminOid" resultType="java.lang.Long">
+        SELECT role_id FROM p_admin_role WHERE admin_oid = #{adminOid}
+    </select>
+
+    <select id="selectPermissionsByAdminOid" resultType="java.lang.String">
         SELECT DISTINCT m.permission
-        FROM sys_menu m
-        INNER JOIN sys_role_menu rm ON m.id = rm.menu_id
-        INNER JOIN sys_admin_role ar ON rm.role_id = ar.role_id
-        WHERE ar.admin_id = #{adminId}
+        FROM p_menu m
+        INNER JOIN p_role_menu rm ON m.id = rm.menu_id
+        INNER JOIN p_admin_role ar ON rm.role_id = ar.role_id
+        WHERE ar.admin_oid = #{adminOid}
           AND m.permission IS NOT NULL
           AND m.permission != ''
-          AND m.status = 1
-          AND m.del_flag = 0
+          AND m.state = 1
+          AND m.is_delete = 0
     </select>
 
 </mapper>
