@@ -238,4 +238,121 @@ CREATE TABLE `sys_login_log` (
   KEY `idx_status` (`status`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='登录日志表';
 
+-- ----------------------------
+-- 管理员表（运营后台）
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_admin`;
+CREATE TABLE `sys_admin` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `username` varchar(64) NOT NULL COMMENT '用户名',
+  `password` varchar(128) NOT NULL COMMENT '密码',
+  `real_name` varchar(64) DEFAULT NULL COMMENT '真实姓名',
+  `phone` varchar(16) DEFAULT NULL COMMENT '手机号',
+  `email` varchar(128) DEFAULT NULL COMMENT '邮箱',
+  `avatar` varchar(512) DEFAULT NULL COMMENT '头像',
+  `sex` tinyint(1) DEFAULT '0' COMMENT '性别：0-未知，1-男，2-女',
+  `org_id` bigint(20) DEFAULT NULL COMMENT '所属组织ID',
+  `last_login_time` datetime DEFAULT NULL COMMENT '最后登录时间',
+  `last_login_ip` varchar(64) DEFAULT NULL COMMENT '最后登录IP',
+  `status` tinyint(1) DEFAULT '1' COMMENT '状态：0-禁用，1-正常',
+  `remark` varchar(256) DEFAULT NULL COMMENT '备注',
+  `create_by` varchar(64) DEFAULT NULL COMMENT '创建人',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(64) DEFAULT NULL COMMENT '更新人',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志：0-正常，1-删除',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `uk_username` (`username`) USING BTREE,
+  KEY `idx_org_id` (`org_id`) USING BTREE,
+  KEY `idx_status` (`status`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8mb4 COMMENT='管理员表';
+
+-- ----------------------------
+-- 初始化管理员账号 (密码: admin123)
+-- BCrypt加密后: $2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iYUyPCTA8ywkE8YkqevHFAOXJRrm
+-- ----------------------------
+INSERT INTO `sys_admin` (`id`, `username`, `password`, `real_name`, `phone`, `email`, `sex`, `status`, `remark`, `create_by`, `create_time`) VALUES
+(1, 'admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iYUyPCTA8ywkE8YkqevHFAOXJRrm', '超级管理员', '13800138000', 'admin@chaos.com', 1, 1, '系统内置管理员', 'system', NOW());
+
+-- ----------------------------
+-- 管理员角色关联表
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_admin_role`;
+CREATE TABLE `sys_admin_role` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `admin_id` bigint(20) NOT NULL COMMENT '管理员ID',
+  `role_id` bigint(20) NOT NULL COMMENT '角色ID',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `uk_admin_role` (`admin_id`, `role_id`) USING BTREE,
+  KEY `idx_admin_id` (`admin_id`) USING BTREE,
+  KEY `idx_role_id` (`role_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8mb4 COMMENT='管理员角色关联表';
+
+-- ----------------------------
+-- 初始化管理员角色关联
+-- ----------------------------
+INSERT INTO `sys_admin_role` (`admin_id`, `role_id`, `create_time`) VALUES
+(1, 1, NOW());
+
+-- ----------------------------
+-- 组织机构表
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_organization`;
+CREATE TABLE `sys_organization` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `parent_id` bigint(20) DEFAULT '0' COMMENT '父级ID（顶级为0）',
+  `ancestors` varchar(512) DEFAULT NULL COMMENT '祖级列表（逗号分隔）',
+  `org_name` varchar(64) NOT NULL COMMENT '组织名称',
+  `short_name` varchar(64) DEFAULT NULL COMMENT '组织简称',
+  `org_code` varchar(64) DEFAULT NULL COMMENT '组织编码',
+  `leader` varchar(64) DEFAULT NULL COMMENT '负责人',
+  `phone` varchar(16) DEFAULT NULL COMMENT '联系电话',
+  `email` varchar(128) DEFAULT NULL COMMENT '邮箱',
+  `sort` int(11) DEFAULT '0' COMMENT '排序',
+  `status` tinyint(1) DEFAULT '1' COMMENT '状态：0-禁用，1-正常',
+  `create_by` varchar(64) DEFAULT NULL COMMENT '创建人',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(64) DEFAULT NULL COMMENT '更新人',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志：0-正常，1-删除',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_parent_id` (`parent_id`) USING BTREE,
+  KEY `idx_org_code` (`org_code`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8mb4 COMMENT='组织机构表';
+
+-- ----------------------------
+-- 初始化组织机构
+-- ----------------------------
+INSERT INTO `sys_organization` (`id`, `parent_id`, `ancestors`, `org_name`, `short_name`, `org_code`, `sort`, `status`, `create_by`, `create_time`) VALUES
+(1, 0, '0', 'Chaos集团', 'Chaos', 'ORG001', 1, 1, 'system', NOW());
+
+-- ----------------------------
+-- 附件表
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_attachment`;
+CREATE TABLE `sys_attachment` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `file_key` varchar(64) NOT NULL COMMENT '文件唯一标识',
+  `original_name` varchar(256) DEFAULT NULL COMMENT '原文件名',
+  `store_name` varchar(256) DEFAULT NULL COMMENT '存储文件名',
+  `suffix` varchar(32) DEFAULT NULL COMMENT '文件后缀',
+  `file_size` bigint(20) DEFAULT '0' COMMENT '文件大小（字节）',
+  `file_path` varchar(512) DEFAULT NULL COMMENT '存储路径',
+  `file_url` varchar(512) DEFAULT NULL COMMENT '访问URL',
+  `file_type` tinyint(1) DEFAULT '5' COMMENT '文件类型：1-图片，2-文档，3-视频，4-音频，5-其他',
+  `storage_type` tinyint(1) DEFAULT '1' COMMENT '存储类型：1-本地，2-OSS，3-MinIO',
+  `biz_type` varchar(64) DEFAULT NULL COMMENT '业务类型',
+  `biz_id` bigint(20) DEFAULT NULL COMMENT '业务ID',
+  `status` tinyint(1) DEFAULT '1' COMMENT '状态：0-禁用，1-正常',
+  `create_by` varchar(64) DEFAULT NULL COMMENT '创建人',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(64) DEFAULT NULL COMMENT '更新人',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `del_flag` tinyint(1) DEFAULT '0' COMMENT '删除标志：0-正常，1-删除',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `uk_file_key` (`file_key`) USING BTREE,
+  KEY `idx_biz` (`biz_type`, `biz_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='附件表';
+
 SET FOREIGN_KEY_CHECKS = 1;
