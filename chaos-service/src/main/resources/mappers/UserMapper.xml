@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chaos.service.mapper.UserMapper">
+
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="com.chaos.service.entity.dto.user.UserDto">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="nickname" column="nickname"/>
+        <result property="email" column="email"/>
+        <result property="phone" column="phone"/>
+        <result property="avatar" column="avatar"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="isDeleted" column="is_deleted"/>
+    </resultMap>
+
+    <!-- UserVo 结果映射 -->
+    <resultMap id="UserVoResultMap" type="com.chaos.service.entity.vo.user.UserVo">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="nickname" column="nickname"/>
+        <result property="email" column="email"/>
+        <result property="phone" column="phone"/>
+        <result property="avatar" column="avatar"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <!-- 根据用户名查询 -->
+    <select id="selectByUsername" resultMap="BaseResultMap">
+        SELECT id, username, password, nickname, email, phone, avatar, status, create_time, update_time, is_deleted
+        FROM sys_user
+        WHERE username = #{username}
+          AND is_deleted = 0
+    </select>
+
+    <!-- 查询用户列表 -->
+    <select id="selectUserList" resultMap="UserVoResultMap">
+        SELECT id, username, nickname, email, phone, avatar, status, create_time, update_time
+        FROM sys_user
+        WHERE is_deleted = 0
+        <if test="username != null and username != ''">
+            AND username LIKE CONCAT('%', #{username}, '%')
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 查询用户详情 -->
+    <select id="selectUserById" resultMap="UserVoResultMap">
+        SELECT id, username, nickname, email, phone, avatar, status, create_time, update_time
+        FROM sys_user
+        WHERE id = #{id}
+          AND is_deleted = 0
+    </select>
+
+</mapper>
